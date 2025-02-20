@@ -16,6 +16,7 @@ const camera = new Camera(canvas.width, canvas.height);
 let ws;
 let retryTimeout;
 const otherPlayers = new Map();
+const obstacles = new Set();
 
 startButton.addEventListener('click', startGame);
 
@@ -77,6 +78,11 @@ function initWebSocket(playerName) {
           otherPlayers.set(p.id, otherPlayer);
         }
       });
+    } else if (data.type === 'obstacles') {
+      obstacles.clear();
+      data.obstacles.forEach((obstacle) => {
+        obstacles.add(`${obstacle.gridX},${obstacle.gridY}`);
+      });
     } else if (data.type === 'newPlayer') {
       if (data.id !== player.id) {
         let otherPlayer = new Player(data.id, data.name, data.color);
@@ -90,6 +96,8 @@ function initWebSocket(playerName) {
     } else if (data.type === 'removePlayer') {
       otherPlayers.delete(data.id);
       console.log(`Player ${data.name} disconnected`);
+    } else if (data.type === 'obstacle') {
+      obstacles.add(`${data.gridX},${data.gridY}`);
     }
   };
 
@@ -118,10 +126,47 @@ function centerCameraOnPlayer() {
   }
 }
 
+function drawArrow(ctx, fromX, fromY, toX, toY) {
+  const headLength = 10; // length of head in pixels
+  const dx = toX - fromX;
+  const dy = toY - fromY;
+  const angle = Math.atan2(dy, dx);
+  ctx.beginPath();
+  ctx.moveTo(fromX, fromY);
+  ctx.lineTo(toX, toY);
+  ctx.lineTo(
+    toX - headLength * Math.cos(angle - Math.PI / 6),
+    toY - headLength * Math.sin(angle - Math.PI / 6),
+  );
+  ctx.moveTo(toX, toY);
+  ctx.lineTo(
+    toX - headLength * Math.cos(angle + Math.PI / 6),
+    toY - headLength * Math.sin(angle + Math.PI / 6),
+  );
+  ctx.stroke();
+}
+
+function drawObstacles(ctx, camera) {
+  obstacles.forEach((obstacle) => {
+    const [gridX, gridY] = obstacle.split(',').map(Number);
+    const screenX = camera.offsetX + (gridX - gridY) * (camera.tileWidth / 2);
+    const screenY = camera.offsetY + (gridX + gridY) * (camera.tileHeight / 2);
+    ctx.fillStyle = 'red';
+    ctx.beginPath();
+    ctx.moveTo(screenX, screenY - camera.tileHeight / 2);
+    ctx.lineTo(screenX + camera.tileWidth / 2, screenY);
+    ctx.lineTo(screenX, screenY + camera.tileHeight / 2);
+    ctx.lineTo(screenX - camera.tileWidth / 2, screenY);
+    ctx.closePath();
+    ctx.fill();
+  });
+}
+
 function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   drawGrid(ctx, camera);
+  drawObstacles(ctx, camera);
   if (player) {
     player.move();
     player.draw(
@@ -130,6 +175,15 @@ function gameLoop() {
       camera.offsetY,
       camera.tileWidth,
       camera.tileHeight,
+    );
+    drawArrow(
+      ctx,
+      camera.offsetX + (player.gridX - player.gridY) * (camera.tileWidth / 2),
+      camera.offsetY + (player.gridX + player.gridY) * (camera.tileHeight / 2),
+      camera.offsetX +
+        (player.targetGridX - player.targetGridY) * (camera.tileWidth / 2),
+      camera.offsetY +
+        (player.targetGridX + player.targetGridY) * (camera.tileHeight / 2),
     );
   }
 
@@ -151,7 +205,27 @@ function gameLoop() {
 // Mouse event handlers
 canvas.addEventListener('mousedown', (event) => {
   if (event.button === 0) {
-    camera.startDragging(event.clientX, event.clientY);
+    if (event.shiftKey) {
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      const isoX = (x - camera.offsetX) / (camera.tileWidth / 2);
+      const isoY = (y - camera.offsetY) / (camera.tileHeight / 2);
+      const gridX = Math.floor((isoX + isoY) / 2);
+      const gridY = Math.floor((isoY - isoX) / 2);
+      console.log(`Placing obstacle at (${gridX}, ${gridY})`);
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(
+          JSON.stringify({
+            type: 'placeObstacle',
+            gridX,
+            gridY,
+          }),
+        );
+      }
+    } else {
+      camera.startDragging(event.clientX, event.clientY);
+    }
   }
 });
 
@@ -181,6 +255,11 @@ canvas.addEventListener('mouseup', (event) => {
 
 canvas.addEventListener('mouseleave', () => {
   camera.cancelDragging();
+});
+
+// Prevent context menu on right-click
+canvas.addEventListener('contextmenu', (event) => {
+  event.preventDefault();
 });
 
 // Start game

@@ -2,7 +2,9 @@ import {
   handlePlayerMove,
   handlePlayerDisconnect,
   handlePlayerConnect,
+  handlePlaceObstacle,
   getAllPlayers,
+  getAllObstacles,
 } from '../models/playerModel.js';
 
 export function setupWebSocket(wss) {
@@ -24,8 +26,13 @@ export function setupWebSocket(wss) {
           }),
         );
         ws.send(JSON.stringify({ type: 'players', players: getAllPlayers() }));
+        ws.send(
+          JSON.stringify({ type: 'obstacles', obstacles: getAllObstacles() }),
+        );
       } else if (data.type === 'move') {
         handlePlayerMove(playerId, data.gridX, data.gridY, ws, wss);
+      } else if (data.type === 'placeObstacle') {
+        handlePlaceObstacle(data.gridX, data.gridY, ws, wss);
       }
     });
 
