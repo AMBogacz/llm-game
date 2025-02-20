@@ -17,7 +17,15 @@ let ws;
 let retryTimeout;
 const otherPlayers = new Map();
 
-startButton.addEventListener('click', () => {
+startButton.addEventListener('click', startGame);
+
+nameInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    startGame();
+  }
+});
+
+function startGame() {
   const playerName = nameInput.value.trim();
   if (playerName) {
     nameInputContainer.style.display = 'none';
@@ -26,7 +34,7 @@ startButton.addEventListener('click', () => {
   } else {
     alert('Please enter a name');
   }
-});
+}
 
 function initWebSocket(playerName) {
   ws = new WebSocket('ws://localhost:8080');

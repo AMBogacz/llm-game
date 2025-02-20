@@ -4,47 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Multiplayer Game</title>
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        background-color: #000;
-      }
-
-      #gameContainer {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-      }
-
-      canvas {
-        border: 1px solid #fff;
-      }
-
-      #nameInputContainer {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-      }
-
-      #nameInput {
-        padding: 10px;
-        font-size: 16px;
-      }
-
-      #startButton {
-        padding: 10px 20px;
-        font-size: 16px;
-        cursor: pointer;
-      }
-    </style>
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div id="gameContainer">
@@ -52,7 +12,7 @@
         <input type="text" id="nameInput" placeholder="Enter your name" />
         <button id="startButton">Start Game</button>
       </div>
-      <canvas id="gameCanvas" style="display: none"></canvas>
+      <canvas id="gameCanvas"></canvas>
     </div>
     <script type="module" src="game.js"></script>
   </body>

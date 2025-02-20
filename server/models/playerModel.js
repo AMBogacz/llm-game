@@ -49,7 +49,7 @@ export function handlePlayerMove(playerId, gridX, gridY, ws, wss) {
 
     // Broadcast to all other clients
     wss.clients.forEach((client) => {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
+      if (client.readyState === WebSocket.OPEN) {
         client.send(
           JSON.stringify({
             type: 'move',
