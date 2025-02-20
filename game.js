@@ -15,10 +15,21 @@ function logEvent(message) {
   eventConsole.scrollTop = eventConsole.scrollHeight;
 }
 
+// Click handler for movement
+canvas.addEventListener('click', (event) => {
+  const rect = canvas.getBoundingClientRect();
+  const clickX = event.clientX - rect.left;
+  const clickY = event.clientY - rect.top;
+
+  player.setTarget(clickX, clickY);
+  logEvent(`Moving to (${Math.round(clickX)}, ${Math.round(clickY)})`);
+});
+
 function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  player.draw(ctx);
+  player.move(); // Update player position
+  player.draw(ctx); // Draw player at new position
 
   requestAnimationFrame(gameLoop);
 }
