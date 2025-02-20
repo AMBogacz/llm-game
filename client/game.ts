@@ -40,7 +40,7 @@ function drawGrid(): void {
   ctx.lineWidth = 1;
 
   for (let y = 0; y <= GRID_HEIGHT; y++) {
-    for (let x = 0; x <= GRID_WIDTH; x++) {
+    for (let x = 0; y <= GRID_WIDTH; x++) {
       const screenX = cameraX + (x - y) * (TILE_WIDTH / 2);
       const screenY = cameraY + (x + y) * (TILE_HEIGHT / 2);
 

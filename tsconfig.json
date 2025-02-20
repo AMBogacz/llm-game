@@ -7,13 +7,15 @@
         "strict": true,
         "esModuleInterop": true,
         "moduleResolution": "node",
-        "sourceMap": true
+        "sourceMap": true,
+        "forceConsistentCasingInFileNames": true
     },
     "include": [
         "client/**/*",
         "server/**/*"
     ],
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "**/*.spec.ts"
     ]
 }

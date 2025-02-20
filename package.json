@@ -1,11 +1,12 @@
 {
-  "name": "grok-game",
+  "name": "llm-made-game",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start:client": "npx serve ./client",
-    "start:server": "node --loader ts-node/esm server/server.ts"
+    "start:client": "vite",
+    "start:server": "node dist/server/server.js",
+    "start:all": "concurrently \"npm run start:client\" \"npm run start:server\""
   },
   "keywords": [],
   "author": "",
@@ -18,6 +19,11 @@
     "express": "^4.21.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3",
-    "ws": "^8.18.0"
+    "ws": "^8.18.0",
+    "tsconfig-paths": "^4.0.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "vite": "^4.0.0"
   }
 }

@@ -33,6 +33,7 @@ wss.on('connection', (ws: WebSocket) => {
             client.send(
               JSON.stringify({
                 type: 'move',
+                id: playerId, // Include playerId in the broadcast message
                 gridX: data.gridX,
                 gridY: data.gridY,
               }),
