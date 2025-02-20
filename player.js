@@ -1,43 +1,43 @@
 export const player = {
-  x: 400,
-  y: 300,
+  gridX: 15, // Middle of 30-wide grid
+  gridY: 11, // Middle of 22-high grid
   width: 20,
   height: 20,
   color: '#00ff00',
-  targetX: 400, // Where player wants to go
-  targetY: 300,
-  speed: 2, // Pixels per frame
+  targetGridX: 15,
+  targetGridY: 11,
+  speed: 0.1,
 
-  draw(ctx) {
+  draw(ctx, offsetX, offsetY, tileWidth, tileHeight) {
+    const screenX = offsetX + (this.gridX - this.gridY) * (tileWidth / 2);
+    const screenY = offsetY + (this.gridX + this.gridY) * (tileHeight / 2);
+
     ctx.fillStyle = this.color;
     ctx.fillRect(
-      this.x - this.width / 2,
-      this.y - this.height / 2,
+      screenX - this.width / 2,
+      screenY - this.height / 2,
       this.width,
       this.height,
     );
   },
 
   move() {
-    // Calculate distance to target
-    const dx = this.targetX - this.x;
-    const dy = this.targetY - this.y;
+    const dx = this.targetGridX - this.gridX;
+    const dy = this.targetGridY - this.gridY;
     const distance = Math.sqrt(dx * dx + dy * dy);
 
-    // Move if not at target
     if (distance > this.speed) {
       const angle = Math.atan2(dy, dx);
-      this.x += Math.cos(angle) * this.speed;
-      this.y += Math.sin(angle) * this.speed;
+      this.gridX += Math.cos(angle) * this.speed;
+      this.gridY += Math.sin(angle) * this.speed;
     } else {
-      // Snap to target if close enough
-      this.x = this.targetX;
-      this.y = this.targetY;
+      this.gridX = this.targetGridX;
+      this.gridY = this.targetGridY;
     }
   },
 
-  setTarget(x, y) {
-    this.targetX = x;
-    this.targetY = y;
+  setTarget(gridX, gridY) {
+    this.targetGridX = gridX;
+    this.targetGridY = gridY;
   },
 };
