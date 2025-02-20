@@ -8,8 +8,8 @@ const nameInputContainer = document.getElementById('nameInputContainer');
 const nameInput = document.getElementById('nameInput');
 const startButton = document.getElementById('startButton');
 
-canvas.width = 800;
-canvas.height = 600;
+canvas.width = 1024;
+canvas.height = 768;
 
 let player;
 const camera = new Camera(canvas.width, canvas.height);
@@ -52,6 +52,7 @@ function initWebSocket(playerName) {
     const data = JSON.parse(event.data);
     if (data.type === 'init') {
       player = new Player(data.id, data.name, data.color);
+      centerCameraOnPlayer();
     } else if (data.type === 'move') {
       if (data.id === player.id) {
         player.setTarget(data.gridX, data.gridY);
@@ -104,6 +105,16 @@ function retryConnection(playerName) {
       console.log('Attempting to reconnect...');
       initWebSocket(playerName);
     }, 5000); // Retry every 5 seconds
+  }
+}
+
+function centerCameraOnPlayer() {
+  if (player) {
+    camera.offsetX =
+      canvas.width / 2 - (player.gridX - player.gridY) * (camera.tileWidth / 2);
+    camera.offsetY =
+      canvas.height / 2 -
+      (player.gridX + player.gridY) * (camera.tileHeight / 2);
   }
 }
 
