@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Multiplayer Game</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-color: #000;
+      }
+
+      #gameContainer {
+        display: flex;
+        gap: 20px;
+      }
+
+      canvas {
+        border: 1px solid #fff;
+      }
+
+      #eventConsole {
+        width: 300px;
+        height: 600px;
+        background-color: #1a1a1a;
+        border: 1px solid #fff;
+        color: #fff;
+        font-family: 'Courier New', monospace;
+        padding: 10px;
+        overflow-y: auto;
+        box-sizing: border-box;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="gameContainer">
+      <canvas id="gameCanvas"></canvas>
+      <div id="eventConsole"></div>
+    </div>
+
+    <script>
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+      const eventConsole = document.getElementById('eventConsole');
+
+      canvas.width = 800;
+      canvas.height = 600;
+
+      function logEvent(message) {
+        const timestamp = new Date().toLocaleTimeString();
+        const eventLine = document.createElement('p');
+        eventLine.textContent = `[${timestamp}] ${message}`;
+        eventConsole.appendChild(eventLine);
+        eventConsole.scrollTop = eventConsole.scrollHeight;
+      }
+
+      // Game loop
+      function gameLoop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw player
+        player.draw(ctx);
+
+        requestAnimationFrame(gameLoop);
+      }
+
+      // Start game
+      gameLoop();
+      logEvent('Game initialized');
+    </script>
+    <script src="player.js" type="module"></script>
+  </body>
+</html>
