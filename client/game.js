@@ -59,15 +59,13 @@ function initWebSocket(playerName) {
         `Server moved player ${data.name} to (${data.gridX}, ${data.gridY})`,
       );
     } else if (data.type === 'players') {
+      otherPlayers.clear(); // Clear the map before adding current players
       data.players.forEach((p) => {
         if (p.id !== player.id) {
-          let otherPlayer = otherPlayers.get(p.id);
-          if (!otherPlayer) {
-            otherPlayer = new Player(p.id, p.name, p.color);
-            otherPlayers.set(p.id, otherPlayer);
-          }
+          let otherPlayer = new Player(p.id, p.name, p.color);
           otherPlayer.gridX = p.gridX;
           otherPlayer.gridY = p.gridY;
+          otherPlayers.set(p.id, otherPlayer);
         }
       });
     } else if (data.type === 'newPlayer') {
