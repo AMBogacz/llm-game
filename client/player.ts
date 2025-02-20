@@ -1,14 +1,20 @@
-export const player = {
-  gridX: 15, // Middle of 30-wide grid
-  gridY: 11, // Middle of 22-high grid
-  width: 20,
-  height: 20,
-  color: '#00ff00',
-  targetGridX: 15,
-  targetGridY: 11,
-  speed: 0.1,
+export class Player {
+  gridX: number = 15;
+  gridY: number = 11;
+  width: number = 20;
+  height: number = 20;
+  color: string = '#00ff00';
+  targetGridX: number = 15;
+  targetGridY: number = 11;
+  speed: number = 0.1;
 
-  draw(ctx, offsetX, offsetY, tileWidth, tileHeight) {
+  draw(
+    ctx: CanvasRenderingContext2D,
+    offsetX: number,
+    offsetY: number,
+    tileWidth: number,
+    tileHeight: number,
+  ): void {
     const screenX = offsetX + (this.gridX - this.gridY) * (tileWidth / 2);
     const screenY = offsetY + (this.gridX + this.gridY) * (tileHeight / 2);
 
@@ -19,9 +25,9 @@ export const player = {
       this.width,
       this.height,
     );
-  },
+  }
 
-  move() {
+  move(): void {
     const dx = this.targetGridX - this.gridX;
     const dy = this.targetGridY - this.gridY;
     const distance = Math.sqrt(dx * dx + dy * dy);
@@ -34,10 +40,10 @@ export const player = {
       this.gridX = this.targetGridX;
       this.gridY = this.targetGridY;
     }
-  },
+  }
 
-  setTarget(gridX, gridY) {
+  setTarget(gridX: number, gridY: number): void {
     this.targetGridX = gridX;
     this.targetGridY = gridY;
-  },
-};
+  }
+}

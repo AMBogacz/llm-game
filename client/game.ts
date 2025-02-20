@@ -1,32 +1,33 @@
-import { player } from './player.js';
+import { Player } from './player.js';
 
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-const eventConsole = document.getElementById('eventConsole');
+const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
+const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+const eventConsole = document.getElementById('eventConsole') as HTMLDivElement;
 
 canvas.width = 800;
 canvas.height = 600;
 
-const TILE_WIDTH = 40;
-const TILE_HEIGHT = 20;
-const GRID_WIDTH = 30;
-const GRID_HEIGHT = 22;
+const TILE_WIDTH: number = 40;
+const TILE_HEIGHT: number = 20;
+const GRID_WIDTH: number = 30;
+const GRID_HEIGHT: number = 22;
 
-// Camera offset (initially centered)
-let cameraX =
+let cameraX: number =
   (canvas.width - (GRID_WIDTH + GRID_HEIGHT) * (TILE_WIDTH / 2)) / 2 +
   TILE_WIDTH / 2;
-let cameraY =
+let cameraY: number =
   (canvas.height - (GRID_WIDTH + GRID_HEIGHT) * (TILE_HEIGHT / 2)) / 2;
 
-// Mouse tracking
-let isDragging = false;
-let lastMouseX = 0;
-let lastMouseY = 0;
-let clickTimer = null;
-const CLICK_THRESHOLD = 200; // Milliseconds to distinguish click from drag
+let isDragging: boolean = false;
+let lastMouseX: number = 0;
+let lastMouseY: number = 0;
+let clickTimer: NodeJS.Timeout | null = null;
+const CLICK_THRESHOLD: number = 200;
 
-function logEvent(message) {
+const player: Player = new Player();
+let ws: WebSocket;
+
+function logEvent(message: string): void {
   const timestamp = new Date().toLocaleTimeString();
   const eventLine = document.createElement('p');
   eventLine.textContent = `[${timestamp}] ${message}`;
@@ -34,7 +35,7 @@ function logEvent(message) {
   eventConsole.scrollTop = eventConsole.scrollHeight;
 }
 
-function drawGrid() {
+function drawGrid(): void {
   ctx.strokeStyle = '#333333';
   ctx.lineWidth = 1;
 
@@ -54,7 +55,7 @@ function drawGrid() {
   }
 }
 
-function screenToGrid(x, y) {
+function screenToGrid(x: number, y: number): { x: number; y: number } {
   const adjustedX = x - cameraX;
   const adjustedY = y - cameraY;
 
@@ -69,14 +70,33 @@ function screenToGrid(x, y) {
   };
 }
 
+// WebSocket setup
+function initWebSocket(): void {
+  ws = new WebSocket('ws://localhost:8080');
+
+  ws.onopen = () => {
+    logEvent('Connected to server');
+  };
+
+  ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    if (data.type === 'move') {
+      player.setTarget(data.gridX, data.gridY);
+      logEvent(`Server moved player to (${data.gridX}, ${data.gridY})`);
+    }
+  };
+
+  ws.onclose = () => {
+    logEvent('Disconnected from server');
+  };
+}
+
 // Mouse event handlers
-canvas.addEventListener('mousedown', (event) => {
+canvas.addEventListener('mousedown', (event: MouseEvent) => {
   if (event.button === 0) {
-    // Left mouse button
     lastMouseX = event.clientX;
     lastMouseY = event.clientY;
 
-    // Start a timer to detect if this becomes a drag
     clickTimer = setTimeout(() => {
       isDragging = true;
       clickTimer = null;
@@ -84,7 +104,7 @@ canvas.addEventListener('mousedown', (event) => {
   }
 });
 
-canvas.addEventListener('mousemove', (event) => {
+canvas.addEventListener('mousemove', (event: MouseEvent) => {
   if (isDragging) {
     const deltaX = event.clientX - lastMouseX;
     const deltaY = event.clientY - lastMouseY;
@@ -95,10 +115,9 @@ canvas.addEventListener('mousemove', (event) => {
   }
 });
 
-canvas.addEventListener('mouseup', (event) => {
+canvas.addEventListener('mouseup', (event: MouseEvent) => {
   if (event.button === 0) {
     if (clickTimer) {
-      // If timer exists, it was a click, not a drag
       clearTimeout(clickTimer);
       clickTimer = null;
 
@@ -115,6 +134,15 @@ canvas.addEventListener('mouseup', (event) => {
       ) {
         player.setTarget(gridPos.x, gridPos.y);
         logEvent(`Moving to grid (${gridPos.x}, ${gridPos.y})`);
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(
+            JSON.stringify({
+              type: 'move',
+              gridX: gridPos.x,
+              gridY: gridPos.y,
+            }),
+          );
+        }
       }
     }
     isDragging = false;
@@ -129,7 +157,7 @@ canvas.addEventListener('mouseleave', () => {
   isDragging = false;
 });
 
-function gameLoop() {
+function gameLoop(): void {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   drawGrid();
@@ -140,5 +168,6 @@ function gameLoop() {
 }
 
 // Start game
+initWebSocket();
 gameLoop();
 logEvent('Game initialized');
