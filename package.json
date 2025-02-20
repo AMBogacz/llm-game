@@ -3,10 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "start:client": "vite",
-    "start:server": "node dist/server/server.js",
-    "start:all": "concurrently \"npm run start:client\" \"npm run start:server\""
+    
   },
   "keywords": [],
   "author": "",
