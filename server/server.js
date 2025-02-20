@@ -1,48 +1,13 @@
 import express from 'express';
-import { WebSocketServer, WebSocket } from 'ws';
 import http from 'http';
+import { WebSocketServer } from 'ws';
+import { setupWebSocket } from './controllers/gameController.js';
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 
-const players = new Map();
-
-wss.on('connection', (ws) => {
-  const playerId = Math.random().toString(36).substring(2, 15);
-  players.set(playerId, { id: playerId, gridX: 15, gridY: 11 });
-  console.log(`Player ${playerId} connected`);
-
-  ws.on('message', (message) => {
-    const data = JSON.parse(message);
-    if (data.type === 'move') {
-      const player = players.get(playerId);
-      if (player) {
-        player.gridX = data.gridX;
-        player.gridY = data.gridY;
-
-        // Broadcast to all other clients
-        wss.clients.forEach((client) => {
-          if (client !== ws && client.readyState === WebSocket.OPEN) {
-            client.send(
-              JSON.stringify({
-                type: 'move',
-                id: playerId, // Include playerId in the broadcast message
-                gridX: data.gridX,
-                gridY: data.gridY,
-              }),
-            );
-          }
-        });
-      }
-    }
-  });
-
-  ws.on('close', () => {
-    players.delete(playerId);
-    console.log(`Player ${playerId} disconnected`);
-  });
-});
+setupWebSocket(wss);
 
 server.listen(8080, () => {
   console.log('Server running on port 8080');

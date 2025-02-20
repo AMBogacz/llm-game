@@ -18,6 +18,8 @@
 
       #gameContainer {
         display: flex;
+        flex-direction: column;
+        align-items: center;
         gap: 20px;
       }
 
@@ -25,23 +27,32 @@
         border: 1px solid #fff;
       }
 
-      #eventConsole {
-        width: 300px;
-        height: 600px;
-        background-color: #1a1a1a;
-        border: 1px solid #fff;
-        color: #fff;
-        font-family: 'Courier New', monospace;
+      #nameInputContainer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      }
+
+      #nameInput {
         padding: 10px;
-        overflow-y: auto;
-        box-sizing: border-box;
+        font-size: 16px;
+      }
+
+      #startButton {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
       }
     </style>
   </head>
   <body>
     <div id="gameContainer">
-      <canvas id="gameCanvas"></canvas>
-      <div id="eventConsole"></div>
+      <div id="nameInputContainer">
+        <input type="text" id="nameInput" placeholder="Enter your name" />
+        <button id="startButton">Start Game</button>
+      </div>
+      <canvas id="gameCanvas" style="display: none"></canvas>
     </div>
     <script type="module" src="game.js"></script>
   </body>

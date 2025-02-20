@@ -2,6 +2,10 @@ import { screenToGrid } from './utils.js';
 
 export class Camera {
   constructor(canvasWidth, canvasHeight) {
+    this.tileWidth = 40;
+    this.tileHeight = 20;
+    this.gridWidth = 30;
+    this.gridHeight = 22;
     this.offsetX =
       (canvasWidth -
         (this.gridWidth + this.gridHeight) * (this.tileWidth / 2)) /
@@ -11,10 +15,6 @@ export class Camera {
       (canvasHeight -
         (this.gridWidth + this.gridHeight) * (this.tileHeight / 2)) /
       2;
-    this.tileWidth = 40;
-    this.tileHeight = 20;
-    this.gridWidth = 30;
-    this.gridHeight = 22;
     this.isDragging = false;
     this.lastMouseX = 0;
     this.lastMouseY = 0;
